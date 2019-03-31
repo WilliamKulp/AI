@@ -1,0 +1,253 @@
+#include<iostream>
+#include<string>
+#include<algorithm>
+using namespace std;
+
+int Minimax(char board[][3]);
+
+struct Move {
+	int row;
+	int col;
+};
+
+char player = 'o';
+char computer = 'x';
+
+bool movesLeft(char board[][3]) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == '_')
+				return true;
+		}
+	}
+	return false;
+}
+
+//winning conditions for player
+int TerminalTest(char board[][3]) {
+	
+	if (board[0][0] == computer && board[1][0] == computer && board[2][0] == computer)
+	return 1;
+	if (board[0][1] == computer && board[1][1] == computer && board[2][1] == computer)
+	return 1;
+	if (board[0][2] == computer && board[1][2] == computer && board[2][2] == computer)
+	return 1;
+
+
+	if (board[0][0] == computer && board[0][1] == computer && board[0][2] == computer)
+	return 1;
+	if (board[1][0] == computer && board[1][1] == computer && board[1][2] == computer)
+	return 1;
+	if (board[2][0] == computer && board[2][1] == computer && board[2][2] == computer)
+	return 1;
+
+	//check diagonals top left
+	if (board[0][0] == computer && board[1][1] == computer && board[2][2] == computer)
+	return 1;
+	if (board[0][2] == computer && board[1][1] == computer && board[2][0] == computer)
+	return 1;
+
+	//check columns
+	if (board[0][0] == player && board[1][0] == player && board[2][0] == player)
+	return -1;
+	if (board[0][1] == player && board[1][1] == player && board[2][1] == player)
+	return -1;
+	if (board[0][2] == player && board[1][2] == player && board[2][2] == player)
+	return -1;
+
+	//check all rows
+
+	if (board[0][0] == player && board[0][1] == player && board[0][2] == player)
+	return -1;
+	if (board[1][0] == player && board[1][1] == player && board[1][2] == player)
+	return -1;
+	if (board[2][0] == player && board[2][1] == player && board[2][2] == player)
+	return -1;
+
+	//check diagonals top left
+	if (board[0][0] == player && board[1][1] == player && board[2][2] == player)
+	return -1;
+	if (board[0][2] == player && board[1][1] == player && board[2][0] == player)
+	return -1;
+
+
+	//check bottom right
+	//if the next choice
+	return 0;
+	
+
+	
+}
+
+int mini(char board[][3])
+{
+
+int score = TerminalTest(board);
+
+if (score == 1)
+return 1;
+if (score == -1)
+return -1;
+if (!movesLeft(board))
+return 0;
+
+int min = 1000;
+
+for (int h = 0; h < 3; h++) {
+for (int l = 0; l < 3; l++) {
+if (board[h][l] == '_') {
+board[h][l] = player;
+int b = Minimax(board);
+if (b < min) {
+min = b;
+}
+board[h][l] = '_';
+}
+}
+}
+//call the max funtion
+return min;
+}
+
+
+
+
+
+int Minimax(char board[][3])
+{
+int score = TerminalTest(board);
+
+if (score == 1)
+return 1;
+if (score == -1)
+return -1;
+if (!movesLeft(board))
+return 0;
+
+int max = -1000;
+
+for (int i = 0; i < 3; i++) {
+for (int j = 0; j < 3; j++) {
+if (board[i][j] == '_') {
+board[i][j] = computer;
+int v = mini(board);
+if (v > max)
+max = v;
+board[i][j] = '_';
+}
+}
+}
+return max;
+}
+
+//break into first function
+//Mins turn to shine
+
+
+//need a function to grab each of the values, based upon the two above functions
+Move bestMove(char board[][3]) {
+
+	int bestValue = -100;
+	Move best;
+	best.row = -1;
+	best.col = -1;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == '_') {
+
+				board[i][j] = computer;
+				int value = mini(board);
+
+				board[i][j] = '_';
+
+				if (value > bestValue) {
+					bestValue = value;
+					//record the coordinates
+					best.row = i;
+					best.col = j;
+
+				}
+			}
+		}
+	}
+
+	return best;
+}
+
+
+
+void printBoard(char board[][3]) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if ((board[i][j]) == NULL) {
+				cout << " _ ";
+				continue;
+			}
+			cout << board[i][j];
+		}
+		cout << endl;
+	}
+}
+
+
+
+int main()
+{
+	int x, y;
+	char board[3][3] = { { '_','_','_' },{ '_','_','_' },{ '_','_','_' } };
+	cout << "Welcome to the tic tac toe game, play against a AI computer" << endl;
+	cout << "You will make the first move, you are o" << endl;
+	cout << "Enter the coordinates of your choice: ";
+	cin >> x >> y;
+	board[x][y] = player;
+
+	printBoard(board);
+	cout << endl;
+
+
+	while (movesLeft(board)) {
+
+		//computer will pick
+		//minimax function called to make the selection
+
+		//returns the best move for the computer
+		Move compMove = bestMove(board);
+
+		//add move to the board
+		board[compMove.row][compMove.col] = computer;
+
+		//check for a win condition
+
+
+		if (TerminalTest(board) != 0)
+			break;
+
+		//print board
+		printBoard(board);
+		cout << endl;
+
+		//player will go
+		cout << "Please enter the coordinates of your choice." << endl;
+		cin >> x >> y;
+
+		board[x][y] = player;
+		//print board
+		printBoard(board);
+		cout << endl;
+
+		if (TerminalTest(board) != 0)
+			break;
+	}
+	printBoard(board);
+
+	if (TerminalTest(board) == -1) //check for a winning condition
+		cout << "You won against an impossible opponent" << endl;
+	else if (TerminalTest(board) == 1)
+		cout << "You lost. The computer won." << endl;
+	else
+		cout << "It's a draw";
+
+	return 0;
+}
+
+
